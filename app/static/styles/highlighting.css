@@ -1,0 +1,52 @@
+pre {
+    color: #ADBAC7;
+    background-color: #2D333B;
+    border: #1a1a1a 1px solid;
+    border-radius: 3px;
+    padding: 5px;
+}
+/* Bash highlighting */
+.lang-bash .hljs-keyword {
+    color: #d73a49;
+}
+
+/* Python highlighting */
+.lang-python .hljs-keyword {
+    color: #d73a49;
+}
+
+.lang-python .hljs-title {
+    color: #d73a49;
+}
+
+.lang-python .hljs-number {
+    color: #5691bd;
+}
+
+.lang-python .hljs-string {
+    color: #90C7F3;
+}
+
+.lang-python .hljs-built_in {
+    color: #e36209;
+}
+
+.lang-python .hljs-selector-class {
+    color: #22863a;
+}
+
+.lang-python .hljs-function .hljs-title {
+    color: #005cc5;
+}
+
+.lang-python .hljs-function .hljs-params {
+    color: #cbcbcb;
+}
+
+.lang-python .hljs-selector-tag {
+    color: #d73a49;
+}
+
+.lang-python .hljs-variable {
+    color: #6f42c1;
+}

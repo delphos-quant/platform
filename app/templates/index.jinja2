@@ -1,0 +1,56 @@
+{% extends "layout.jinja2" %}
+
+{% block content %}
+
+
+    <div class="card">
+        <h1 class="site-title">Plataforma Interativa para Modelos Quantitativos</h1>
+        <p class="subtitle">Visualização por meio de dashboards, além de deploy e monitoramento de estratégias em tempo
+            real. (View source on <a href="https://github.com/delphos/platform">Github</a>).</p>
+        <a href="/dashapp/" class="dash-link">
+            <span>Embedded Plotly Dash</span>
+            <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+
+    <!-- Featured Analysis -->
+    <section class="featured-analysis">
+        <h2>Featured Analysis</h2>
+        <div class="analysis-content">
+            <!-- Dummy content; replace with dynamic content -->
+            <p>Here's our recent analysis on stock X and its potential...</p>
+        </div>
+    </section>
+
+    <!-- Quick Strategy Overview -->
+    <section class="strategy-overview">
+        <h2>Recent Strategies Deployed</h2>
+        <div class="strategy-list">
+            <!-- Dummy content; replace with dynamic content -->
+            <p>1. Strategy A - Focused on...</p>
+            <p>2. Strategy B - Targeting...</p>
+        </div>
+    </section>
+
+    <!-- Latest Financial News -->
+    <section class="financial-news">
+        <h2>Latest Financial News</h2>
+        <ul class="news-list">
+            <!-- Dummy content; replace with dynamic content -->
+            <li>News Item 1</li>
+            <li>News Item 2</li>
+        </ul>
+    </section>
+
+    <!-- Team Highlights -->
+    <section class="team-highlights">
+        <h2>Meet Our Team</h2>
+        <div class="team-members">
+            <!-- Dummy content; replace with dynamic photos and bios -->
+            <div class="member">
+                <img src="{{ url_for('static', filename='img/member1.png') }}" alt="Team Member 1">
+                <p>John Doe - Lead Analyst</p>
+            </div>
+        </div>
+    </section>
+{% endblock %}
