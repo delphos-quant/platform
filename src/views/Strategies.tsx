@@ -49,7 +49,7 @@ const Strategies: React.FC = () => {
 
     const [amountInput, setAmountInput] = useState<number | string>("");
 
-    const strategyManagerRoute = 'http://localhost:8000/managers/';
+    const strategyManagerRoute = 'http://localhost:8080/managers/';
 
     useEffect(() => {
         fetchAvailableManagers();
