@@ -1,0 +1,89 @@
+/* Strategies.module.css */
+
+.containerStrategies {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 20px;
+}
+
+.strategyHeader {
+    background-color: #000000;
+    color: #ffffff;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.managerDropdown {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.selectedManagerCard {
+    padding: 10px;
+    text-align: center;
+}
+
+.availableMethods {
+    margin: 40px 0;
+}
+
+.availableMethods p {
+    margin: 0;
+    padding: 10px;
+    border: 1px solid #ffffff;
+}
+
+.dataPreviewTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 40px 0;
+}
+
+.dataPreviewTable th, .dataPreviewTable td {
+    padding: 10px;
+    border: 1px solid #ffffff;
+    text-align: center;
+}
+
+.resultsTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 40px 0;
+}
+
+.resultsTable th, .resultsTable td {
+    padding: 10px;
+    border: 1px solid #ffffff;
+    text-align: center;
+}
+
+.interactivePlots {
+    margin: 40px 0;
+}
+
+.modelInsights {
+    margin: 40px 0;
+}
+
+.modelLogs {
+    width: 100%;
+    padding: 10px;
+    background-color: #333333;
+    color: #ffffff;
+    border: none;
+}
+
+.strategyFooter {
+    background-color: #000000;
+    color: #ffffff;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.plotContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
