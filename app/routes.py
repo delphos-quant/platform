@@ -3,7 +3,7 @@ from dash import dcc, html
 from flask import current_app as app, render_template, g, request
 from flask_babel import gettext
 
-from .dashboards import DashboardManager
+from .dashboards import DashboardManager, ModelManager
 
 
 @app.before_request
@@ -28,6 +28,7 @@ def index():
 
 
 @app.route("/dxlib")
+@app.route("/dxlib/")
 def about_dxlib():
     """dxlib readme."""
     return render_template(
@@ -52,28 +53,48 @@ def create_plot(x, y, plot_type='bar', plot_name='Sample Plot'):
 
 
 @app.route('/strategies')
+@app.route("/strategies/")
 def strategies():
-    # Sample data
-    models = [
-        {"id": "model1", "name": "Model 1", "description": "Alpha Predictor"},
-        {"id": "model2", "name": "Model 2", "description": "Volatility Estimator"}
-    ]
+    model1 = {
+        "id": "model1", "name": "Model 1", "description": "Alpha Predictor",
 
-    hyperparameters = {
-        "learning_rate": 0.01
+        "hyperparameters": {
+            "learning_rate": 0.01
+        },
+
+        "dataset_headers": ["Date", "Price", "Volume"],
+        "dataset_sample": [
+            ["2023-08-01", "100", "5000"],
+            ["2023-08-02", "105", "5500"]
+        ],
+
+        "results_headers": ["Strategy", "Return"],
+        "results": [
+            {"Strategy": "Long-Short", "Return": "5%"},
+            {"Strategy": "Momentum", "Return": "3%"}
+        ],
     }
 
-    dataset_headers = ["Date", "Price", "Volume"]
-    dataset_sample = [
-        ["2023-08-01", "100", "5000"],
-        ["2023-08-02", "105", "5500"]
-    ]
+    model2 = {
+        "id": "model2", "name": "Model 2", "description": "Volatility Estimator",
+        "hyperparameters": {
+            "learning_rate": 0.01
+        },
 
-    results_headers = ["Strategy", "Return"]
-    results = [
-        {"Strategy": "Long-Short", "Return": "5%"},
-        {"Strategy": "Momentum", "Return": "3%"}
-    ]
+        "dataset_headers": ["Date", "Price", "Volume"],
+        "dataset_sample": [
+            ["2023-08-01", "100", "5000"],
+            ["2023-08-02", "105", "5500"]
+        ],
+
+        "results_headers": ["Strategy", "Return"],
+        "results": [
+            {"Strategy": "Long-Short", "Return": "5%"},
+            {"Strategy": "Momentum", "Return": "3%"}
+        ],
+    }
+
+    model_manager = ModelManager([model1, model2])
 
     data = [
         ([1, 2, 3], [4, 1, 2], 'bar', 'Plot 1'),
@@ -88,10 +109,20 @@ def strategies():
     model_insights = "Sample insights about the selected model..."
 
     return render_template("strategies.jinja2",
-                           models=models,
-                           hyperparameters=hyperparameters,
-                           dataset_headers=dataset_headers,
-                           dataset_sample=dataset_sample,
-                           results_headers=results_headers,
-                           results=results,
+                           models=model_manager.models,
                            model_insights=model_insights)
+
+
+@app.route('/tune_model', methods=['POST'])
+def tune_model():
+    dash_manager = DashboardManager()
+    dash_manager.layout = html.Div([
+        create_plot([1, 2, 3], [4, 1, 2], 'bar', 'Plot 1'),
+        create_plot([1, 2, 3], [2, 4, 5], 'bar', 'Plot 2'),
+    ])
+
+
+@app.route("/analysis")
+@app.route("/analysis/")
+def analysis():
+    return render_template("analysis.jinja2")

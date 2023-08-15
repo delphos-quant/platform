@@ -23,7 +23,7 @@
             {% endfor %}
         </select>
         </section>
-
+        <p id="selectedModelDisplay">Selected Model: None</p>
         <!-- Hyperparameter Tuning Section -->
         <section class="hyperparameters">
             <h2>Hyperparameter Tuning</h2>
@@ -109,5 +109,25 @@
         </footer>
 
     </div>
+{% endblock %}
+{% block additional_scripts %}
+<script>
+    document.getElementById('modelDropdown').addEventListener('change', function() {
+        var selectedModelId = this.value;
 
+        $.ajax({
+            url: '/get-learning-rate',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ "model_id": selectedModelId }),
+            dataType: 'json',
+            success: function(response) {
+                document.getElementById('learningRateDisplay').innerText = "Learning Rate: " + response.learning_rate;
+            },
+            error: function(response) {
+                console.error("Error fetching learning rate:", response);
+            }
+        });
+    });
+</script>
 {% endblock %}

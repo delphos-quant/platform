@@ -47,22 +47,20 @@
 
         <!-- Links -->
         <div class="collapse navbar-collapse" id="navbarNav">
+            {% set nav_items = [
+    {'name': 'Home', 'url': '/'},
+    {'name': 'About', 'url': '/about'},
+    {'name': 'Strategies', 'url': '/strategies'},
+    {'name': 'Analysis', 'url': '/analysis'},
+    {'name': 'dxlib', 'url': '/dxlib'}
+] %}
+
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="/">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/about">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/strategies">Strategies</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/analysis">Analysis</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/dxlib">dxlib</a>
-                </li>
+                {% for item in nav_items %}
+                    <li class="nav-item {{ 'active' if request.path == item.url else '' }}">
+                        <a class="nav-link" href="{{ item.url }}">{{ item.name }}</a>
+                    </li>
+                {% endfor %}
             </ul>
 
             <!-- Search Bar -->
@@ -86,7 +84,6 @@
         <p>Learn about our other projects <a href="https://www.github.com/delphos-quant/">here</a>.</p>
     </div>
 </footer>
-{% include 'analytics.jinja2' %}
+{% block additional_scripts %}{% endblock %}
 </body>
-
 </html>

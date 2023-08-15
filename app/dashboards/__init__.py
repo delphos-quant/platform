@@ -3,7 +3,7 @@ from dash import html
 import dash_bootstrap_components as dbc
 
 
-from .data import create_dataframe
+from .data import create_dataframe, DataManager, ModelManager
 
 
 def singleton(cls):
