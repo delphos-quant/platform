@@ -1,8 +1,12 @@
 import React, {useState, useEffect} from 'react';
+import { Helmet } from "react-helmet";
+
 import Plot from 'react-plotly.js';
 import axios from 'axios';
+
+import config from '../config';
 import styles from './Strategies.module.css';
-import {Helmet} from "react-helmet";
+
 
 interface Manager {
     route: string,
@@ -49,7 +53,7 @@ const Strategies: React.FC = () => {
 
     const [amountInput, setAmountInput] = useState<number | string>("");
 
-    const strategyManagerRoute = 'http://localhost:8080/managers/';
+    const strategyManagerRoute = `${config.apiBaseUrl}/managers/`
 
     useEffect(() => {
         fetchAvailableManagers();
@@ -74,7 +78,7 @@ const Strategies: React.FC = () => {
             {amount: parseFloat(amountInput.toString())}
         ).then(response => {
             if (response.status === 200) {
-                console.log( parseFloat(amountInput.toString()))
+                console.log(parseFloat(amountInput.toString()))
                 fetchPortfolio();
 
             }
