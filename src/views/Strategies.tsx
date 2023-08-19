@@ -21,6 +21,7 @@ interface ManagerEndpoint {
 interface Portfolio {
     name: string;
     current_cash: number;
+    current_value: number;
     current_assets: {
         [asset: string]: number
     };
@@ -258,6 +259,7 @@ const Strategies: React.FC = () => {
                 {portfolio && (
                     <div className={styles.portfolioInfo}>
                         <p className={styles.portfolioLabel}>Current Cash: $ {portfolio.current_cash.toFixed(2)}</p>
+                        <p className={styles.portfolioLabel}>Current Asset value: $ {portfolio.current_value.toFixed(2)}</p>
                         <p className={styles.portfolioLabel}>Current Assets:</p>
                         <ul className={styles.assetList}>
                             {Object.entries(portfolio.current_assets).map(([asset, value]) => (
