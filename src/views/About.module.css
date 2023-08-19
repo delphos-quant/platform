@@ -1,0 +1,52 @@
+.aboutpage {
+    background-color: black;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.logo {
+    width: 100px;
+    margin-right: 20px;
+}
+
+.aboutpage h1 {
+    color: yellow;
+}
+
+.aboutpage h2 {
+    color: yellow;
+    margin-top: 30px;
+}
+
+.aboutpage p {
+    margin: 15px 0;
+}
+
+.aboutpage ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.highlight {
+    background-color: yellow;
+    color: black;
+    padding: 0 5px;
+    border-radius: 3px;
+}
+
+.highlightlink {
+    color: yellow;
+    text-decoration: none;
+}
+
+.highlightlink:hover {
+    text-decoration: underline;
+}
