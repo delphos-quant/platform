@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from "react-helmet";
 
 import Plot from 'react-plotly.js';
@@ -21,6 +21,7 @@ interface ManagerEndpoint {
 interface Portfolio {
     name: string;
     current_cash: number;
+    current_value: number;
     current_assets: {
         [asset: string]: number
     };
@@ -61,7 +62,7 @@ const Strategies: React.FC = () => {
 
     const endpointMethodCombinations = availableManagerEndpoints
         ? Object.entries(availableManagerEndpoints).flatMap(([endpointName, methods]) =>
-            Object.keys(methods).map(method => ({endpointName, method}))
+            Object.keys(methods).map(method => ({ endpointName, method }))
         )
         : [];
 
@@ -75,7 +76,7 @@ const Strategies: React.FC = () => {
         }
         await axios.post(
             strategyManagerRoute + selectedManager.name + "/add_cash/",
-            {amount: parseFloat(amountInput.toString())}
+            { amount: parseFloat(amountInput.toString()) }
         ).then(response => {
             if (response.status === 200) {
                 console.log(parseFloat(amountInput.toString()))
@@ -99,7 +100,7 @@ const Strategies: React.FC = () => {
             return;
         }
 
-        setSelectedManagers({name: manager_name, manager: availableManagers[manager_name]});
+        setSelectedManagers({ name: manager_name, manager: availableManagers[manager_name] });
     };
 
     const fetchAvailableManagers = async () => {
@@ -231,7 +232,7 @@ const Strategies: React.FC = () => {
             <section className={styles.availableMethods}>
                 <h2 className={styles.sectionHeading}>Available Methods</h2>
                 <div className={styles.methodContainer}>
-                    {endpointMethodCombinations.map(({endpointName, method}) => (
+                    {endpointMethodCombinations.map(({ endpointName, method }) => (
                         <p key={`${endpointName}-${method}`} className={styles.methodText}>
                             {`${endpointName} ${method}`}
                         </p>
@@ -257,12 +258,13 @@ const Strategies: React.FC = () => {
                 <h2 className={styles.sectionHeading}>Portfolio</h2>
                 {portfolio && (
                     <div className={styles.portfolioInfo}>
-                        <p className={styles.portfolioLabel}>Current Cash: {portfolio.current_cash}</p>
+                        <p className={styles.portfolioLabel}>Current Cash: $ {portfolio.current_cash.toFixed(2)}</p>
+                        <p className={styles.portfolioLabel}>Current Asset value: $ {portfolio.current_value.toFixed(2)}</p>
                         <p className={styles.portfolioLabel}>Current Assets:</p>
                         <ul className={styles.assetList}>
                             {Object.entries(portfolio.current_assets).map(([asset, value]) => (
                                 <li key={asset} className={styles.assetItem}>
-                                    {asset}: {value}
+                                    {asset}: {value.toFixed(2)}
                                 </li>
                             ))}
                         </ul>
@@ -276,22 +278,22 @@ const Strategies: React.FC = () => {
                     <div className={styles.historyTableContainer}>
                         <table className={styles.historyTable}>
                             <thead>
-                            <tr>
-                                <th>Timestamp</th>
-                                {Object.keys(history).map((asset) => (
-                                    <th key={asset}>{asset}</th>
-                                ))}
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {Object.keys(history[Object.keys(history)[0]]).slice(0, showHistory).map((timestamp) => (
-                                <tr key={timestamp}>
-                                    <td>{new Date(parseInt(timestamp)).toLocaleDateString()}</td>
+                                <tr>
+                                    <th>Timestamp</th>
                                     {Object.keys(history).map((asset) => (
-                                        <td key={asset}>{history[asset][timestamp]}</td>
+                                        <th key={asset}>{asset}</th>
                                     ))}
                                 </tr>
-                            ))}
+                            </thead>
+                            <tbody>
+                                {Object.keys(history[Object.keys(history)[0]]).slice(0, showHistory).map((timestamp) => (
+                                    <tr key={timestamp}>
+                                        <td>{new Date(parseInt(timestamp)).toLocaleDateString()}</td>
+                                        {Object.keys(history).map((asset) => (
+                                            <td key={asset}>{history[asset][timestamp].toFixed(2)}</td>
+                                        ))}
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                         {Object.keys(history[Object.keys(history)[0]]).length > showHistory && (
@@ -304,10 +306,10 @@ const Strategies: React.FC = () => {
             </section>
 
             {/* Interactive Plot Section */}
-            <section className="interactive-plots">
+            <section >
                 <h2>Visualizations</h2>
                 {history && (
-                    <div>
+                    <div className={styles.interactivePlots}>
                         <Plot
                             data={Object.keys(history).map((asset) => ({
                                 type: 'scatter',
@@ -318,9 +320,11 @@ const Strategies: React.FC = () => {
                             }))}
                             layout={{
                                 title: 'Historical Asset Values',
-                                xaxis: {title: 'Timestamp'},
-                                yaxis: {title: 'Asset Value'},
+                                xaxis: { title: 'Timestamp' },
+                                yaxis: { title: 'Asset Value' },
+                                width: window.innerWidth - 40
                             }}
+
                         />
                     </div>
                 )}
@@ -330,8 +334,8 @@ const Strategies: React.FC = () => {
             <section className="model-insights">
                 <h2>Model Insights</h2>
                 <textarea readOnly id="modelLogs" rows={10}>
-        {/* Model insights content */}
-      </textarea>
+                    {/* Model insights content */}
+                </textarea>
             </section>
 
             {/* Footer or Additional Info */}

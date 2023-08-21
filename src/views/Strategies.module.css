@@ -59,7 +59,13 @@
 }
 
 .interactivePlots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin: 40px 0;
+    text-align: center;
+    width: 100%; /* Set the desired width */
+    height: 500px; /* Set the desired height */
 }
 
 .modelInsights {
@@ -87,3 +93,81 @@
     align-items: center;
     padding: 20px;
 }
+
+.history {
+    margin: 40px 0;
+}
+
+.sectionHeading {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+.historyTableContainer {
+    overflow-x: auto;
+}
+
+.historyTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.historyTable th, .historyTable td {
+    padding: 10px;
+    border: 1px solid #ffffff;
+    text-align: center;
+}
+
+.historyTable th {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+.showMoreButton {
+    background-color: #333333;
+    color: #ffffff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    margin-top: 10px;
+}
+
+.showMoreButton:hover {
+    background-color: #444444;
+    color: #ffffff;
+}
+
+/* Portfolio Section Styles */
+.portfolio {
+    margin: 40px 0;
+}
+
+.portfolioInfo {
+    padding: 20px;
+    background-color: #333333;
+    border-radius: 5px;
+}
+
+.portfolioLabel {
+    margin: 0;
+    padding: 5px;
+    color: #ffffff;
+}
+
+.assetList {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.assetItem {
+    margin: 5px 0;
+    padding: 5px;
+    border: 1px solid #ffffff;
+    color: #ffffff;
+    border-radius: 5px;
+}
+
+/* Add any other styles you may have */

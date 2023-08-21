@@ -1,14 +1,9 @@
-/* Reset some default eita */
-body, h1, h2, p, ul, li, a {
+body {
+  font-family: 'Arial', sans-serif;
   margin: 0;
   padding: 0;
-  font-family: 'Arial', sans-serif;
-  text-decoration: none;
-}
-
-body {
-  background-color: #1a1a1a; /* Dark gray background */
-  color: #ffffff;  /* White text color */
+  background-color: #1a1a1a;
+  color: #ffffff;
   line-height: 1.6;
 }
 
@@ -20,7 +15,7 @@ body {
 
 .main-header,
 .main-footer {
-  background-color: #000000;  /* Black background */
+  background-color: #000000;
   color: #ffffff;
   padding: 20px 0;
   text-align: center;
@@ -28,20 +23,23 @@ body {
 
 .navbar {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .navbar li a {
-  color: #ffffff;  /* White link color */
+  color: #ffffff;
   padding: 10px 20px;
   display: inline-block;
   border-bottom: 3px solid transparent;
   transition: border-color 0.3s;
+  text-decoration: none;
 }
 
 .navbar li a:hover {
-  border-bottom-color: #FFD700;  /* Golden yellow accent on hover */
+  border-bottom-color: #FFD700;
 }
 
 .search-bar {
@@ -53,30 +51,31 @@ body {
 .search-bar input[type="text"] {
   padding: 10px;
   width: 300px;
-  border: 2px solid #FFD700; /* Golden yellow border for search input */
-  background-color: #333333;  /* Dark gray input background */
-  color: #ffffff;  /* White input text */
+  border: 2px solid #FFD700;
+  background-color: #333333;
+  color: #ffffff;
 }
 
 .search-bar button {
   padding: 10px 20px;
-  background-color: #000000;  /* Black button background */
-  color: #ffffff;  /* White button text */
-  border: 2px solid #FFD700;  /* Golden yellow button border */
+  background-color: #000000;
+  color: #ffffff;
+  border: 2px solid #FFD700;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
 }
 
 .search-bar button:hover {
-  background-color: #FFD700; /* Golden yellow button background on hover */
-  color: #000000;  /* Black button text on hover */
+  background-color: #FFD700;
+  color: #000000;
 }
 
 .card {
-  background-color: #333333;  /* Dark gray card background */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+  background-color: #333333;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   margin: 20px 0;
   padding: 20px;
+  text-align: center;
 }
 
 .card img.logo {
@@ -87,6 +86,7 @@ body {
 .site-title {
   text-align: center;
   margin-top: 20px;
+  font-size: 24px;
 }
 
 .dash-link {
@@ -94,15 +94,16 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  background-color: #FFD700; /* Golden yellow background */
-  color: #000000;  /* Black text */
+  background-color: #FFD700;
+  color: #000000;
   margin-top: 20px;
   transition: background-color 0.3s, color 0.3s;
+  text-decoration: none;
 }
 
 .dash-link:hover {
-  background-color: #b8a000;  /* Darker yellow on hover */
-  color: #ffffff;  /* White text on hover */
+  background-color: #b8a000;
+  color: #ffffff;
 }
 
 .featured-analysis,
@@ -110,6 +111,7 @@ body {
 .financial-news,
 .team-highlights {
   margin: 40px 0;
+  text-align: center;
 }
 
 .team-members .member {
@@ -122,28 +124,29 @@ body {
   height: 100px;
   border-radius: 50%;
   margin-bottom: 10px;
-  border: 3px solid #FFD700; /* Golden yellow border around team images */
+  border: 3px solid #FFD700;
 }
 
-button, .button {
-  background-color: #FFD700; /* Golden yellow background */
-  color: #000000;  /* Black text */
+.button {
+  background-color: #FFD700;
+  color: #000000;
   padding: 10px 20px;
   border: none;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
+  text-decoration: none;
 }
 
-button:hover, .button:hover {
-  background-color: #b8a000;  /* Darker yellow on hover */
-  color: #ffffff;  /* White text on hover */
+.button:hover {
+  background-color: #b8a000;
+  color: #ffffff;
 }
 
 .markdown-body {
   box-sizing: border-box;
   min-width: 200px;
-  max-width: 980px;
   margin: 0 auto;
   padding: 45px;
+  text-align: center;
+  width: 100%;
 }
-
