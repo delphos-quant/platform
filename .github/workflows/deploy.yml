@@ -1,0 +1,58 @@
+name: Deploy to Remote Server
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up OpenVPN
+        uses: unfor19/setup-openvpn@v1
+        with:
+          clientCertSecret: ${{ secrets.OPENVPN_CLIENT_CERT }}
+          clientKeySecret: ${{ secrets.OPENVPN_CLIENT_KEY }}
+          caCertSecret: ${{ secrets.OPENVPN_CA_CERT }}
+          config: ${{ secrets.OPENVPN_CONFIG }}
+          openvpnUsername: ${{ secrets.OPENVPN_USERNAME }}
+          openvpnPassword: ${{ secrets.OPENVPN_PASSWORD }}
+          
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+          
+      - name: Install Dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run build --if-present
+      
+      - name: Compress Build
+        run: tar -czvf build.tar.gz build
+      
+      - name: Copy to Remote Server
+        uses: appleboy/scp-action@v2
+        with:
+          host: ${{ secrets.REMOTE_SERVER_ADDRESS }}
+          username: ${{ secrets.REMOTE_SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "build.tar.gz"
+          target: "/home/delphos/platform/build.tar.gz"
+          
+      - name: SSH into Remote Server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.REMOTE_SERVER_ADDRESS }}
+          username: ${{ secrets.REMOTE_SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/delphos/platform/
+            rm -rf build/
+            tar -xzvf build.tar.gz
