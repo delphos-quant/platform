@@ -1,9 +1,31 @@
 import React from 'react';
-import styles from './styles.module.css'; // Import your CSS module
+import styles from './Home.module.css';
+import styles_a from './Animation.module.css';
+import styles_arrow from './Arrow.module.css';
+
 
 const Home: React.FC = () => {
     return (
         <>
+        <div className={styles.welcome}>
+            <div className={styles.imagecontainer}>
+                <img src="delphos_full.png" alt="delphos_logo" />
+ 
+            </div>
+
+            <div>
+            <h1 className={styles_a.animation_text}>Welcome to Delphos Quant.</h1>
+            </div>
+
+            <div className={styles_arrow.arrow}>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+            </div>
+
+        </div>
+
+
             <div className="card">
                 <h1 className="site-title">Plataforma Interativa para Modelos Quantitativos</h1>
                 <p className="subtitle">Explore, develop, and deploy advanced quantitative models with our intuitive
