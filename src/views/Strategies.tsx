@@ -1,67 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from "react-helmet";
 
-import Plot from 'react-plotly.js';
 import axios from 'axios';
 
 import config from '../config';
 import styles from './Strategies.module.css';
+import SecurityGraph from "../components/SecurityGraph";
+import PortfolioComponent, {Portfolio} from "../components/Portfolio";
 
 
-interface Manager {
+interface Strategy {
     route: string,
-    status: string,
+    name: string,
 }
 
-interface ManagerEndpoint {
+interface StrategyEndpoint {
     route: string,
     description: string,
 }
 
-interface Portfolio {
-    name: string;
-    current_cash: number;
-    current_value: number;
-    current_assets: {
-        [asset: string]: number
-    };
-}
+
 
 interface History {
-    [asset: string]: {
-        [timestamp: string]: number
-    };
+    df : {
+        columns: [string[], string[]];
+        index: string[];
+        data: number[][];
+    }
 }
 
 const Strategies: React.FC = () => {
-    const [availableManagers, setAvailableManagers] = useState<{
-        [key: string]: Manager
-    }>({});
-    const [selectedManager, setSelectedManagers] = useState<{
-        name: string,
-        manager: Manager
-    } | null>(null);
+    const [availableStrategies, setAvailableStrategies] = useState<Strategy[]>([]);
+    const [selectedStrategy, setSelectedStrategies] = useState<Strategy | null>(null);
 
-    const [availableManagerEndpoints, setAvailableManagerEndpoints] = useState<{
+    const [availableEndpoints, setAvailableEndpoints] = useState<{
         [endpoint: string]: {
-            [method: string]: ManagerEndpoint
+            [method: string]: StrategyEndpoint
         }
     }>({});
 
-    const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
+    const [portfolios, setPortfolios] = useState<{[key: string]: Portfolio}>({});
     const [history, setHistory] = useState<History | null>(null);
-    const [showHistory, setShowHistory] = useState(0);
 
     const [amountInput, setAmountInput] = useState<number | string>("");
 
-    const strategyManagerRoute = `${config.apiBaseUrl}/managers/`
+    const strategyRoute = `${config.apiBaseUrl}/strategy/`
 
     useEffect(() => {
-        fetchAvailableManagers();
+        fetchStrategies();
     }, []);
 
-    const endpointMethodCombinations = availableManagerEndpoints
-        ? Object.entries(availableManagerEndpoints).flatMap(([endpointName, methods]) =>
+    const endpointMethodCombinations = availableEndpoints
+        ? Object.entries(availableEndpoints).flatMap(([endpointName, methods]) =>
             Object.keys(methods).map(method => ({ endpointName, method }))
         )
         : [];
@@ -71,11 +61,11 @@ const Strategies: React.FC = () => {
     };
 
     const handleAddCash = async () => {
-        if (selectedManager === null) {
+        if (selectedStrategy === null) {
             return
         }
         await axios.post(
-            strategyManagerRoute + selectedManager.name + "/add_cash/",
+            strategyRoute + selectedStrategy.name + "/add_cash/",
             { amount: parseFloat(amountInput.toString()) }
         ).then(response => {
             if (response.status === 200) {
@@ -93,24 +83,22 @@ const Strategies: React.FC = () => {
         });
     };
 
-    const handleManagerSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const manager_name = event.target.value;
+    const handleStrategySelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const strategy_name = event.target.value;
 
-        if (availableManagers === null || manager_name === "") {
+        if (availableStrategies === null || strategy_name === "") {
             return;
         }
 
-        setSelectedManagers({ name: manager_name, manager: availableManagers[manager_name] });
+        setSelectedStrategies(availableStrategies.find(strategy => strategy.name === strategy_name) || null);
     };
 
-    const fetchAvailableManagers = async () => {
+    const fetchStrategies = async () => {
         try {
-            axios.get(strategyManagerRoute).then(response => {
+            axios.get(strategyRoute).then(response => {
                 if (response.status === 200) {
-                    const available_managers: {
-                        [key: string]: Manager
-                    } = response.data['available'];
-                    setAvailableManagers(available_managers);
+                    const strategies: Strategy[] = response.data['available'];
+                    setAvailableStrategies(strategies);
                 }
             })
         } catch (error) {
@@ -118,15 +106,21 @@ const Strategies: React.FC = () => {
         }
     };
 
-    const fetchPortfolio = async (manager_name: string | null = null) => {
-        if (manager_name === null && selectedManager !== null) {
-            manager_name = selectedManager.name;
+    const fetchPortfolio = async (strategy_route: string | null = null) => {
+        if (strategy_route === null) {
+            if (selectedStrategy === null)
+                return;
+            strategy_route = selectedStrategy.route;
         }
 
-        axios.get(strategyManagerRoute + manager_name + "/portfolio/")
+        axios.get(strategyRoute + strategy_route + "/portfolios/")
             .then(response => {
+                console.log(response.data);
                 if (response.status === 200) {
-                    setPortfolio(response.data);
+                    if (response.data) {
+                        const portfolios: {[key: string]: Portfolio} = response.data;
+                        setPortfolios(portfolios);
+                    }
                 }
             })
             .catch(error => {
@@ -139,22 +133,29 @@ const Strategies: React.FC = () => {
     };
 
     useEffect(() => {
-        if (selectedManager !== null && selectedManager.manager.status === "available") {
-            fetchPortfolio();
+        if (selectedStrategy !== null) {
+            const intervalId = setInterval(fetchPortfolio, 5000); // Poll every 5 seconds (adjust as needed)
+
+            return () => {
+                clearInterval(intervalId); // Cleanup on component unmount
+            };
         } else {
-            setPortfolio(null);
+            setPortfolios({});
         }
-    }, [selectedManager]);
+    }, [selectedStrategy]);
 
-    const fetchHistory = async (manager_name: string | null = null) => {
-        if (manager_name === null && selectedManager !== null) {
-            manager_name = selectedManager.name;
+    const fetchHistory = async (strategy_route: string | null = null) => {
+        if (strategy_route === null) {
+            if (selectedStrategy === null)
+                return;
+            strategy_route = selectedStrategy.route;
         }
 
-        axios.get(strategyManagerRoute + manager_name + "/history/")
+        axios.get(strategyRoute + strategy_route + "/history/")
             .then(response => {
                 if (response.status === 200) {
-                    setHistory(response.data);
+                    if (response.data)
+                        setHistory(response.data);
                 }
             })
             .catch(error => {
@@ -167,23 +168,31 @@ const Strategies: React.FC = () => {
     };
 
     useEffect(() => {
-        if (selectedManager !== null && selectedManager.manager.status === "available") {
-            fetchHistory();
+        if (selectedStrategy !== null) {
+            const intervalId = setInterval(fetchHistory, 5000); // Poll every 5 seconds (adjust as needed)
+
+            return () => {
+                clearInterval(intervalId); // Cleanup on component unmount
+            };
         } else {
             setHistory(null);
         }
-    }, [selectedManager]);
+    }, [selectedStrategy]);
 
-    const fetchAvailableEndpoints = async (manager_name: string | null = null) => {
-        if (manager_name === null && selectedManager !== null) {
-            manager_name = selectedManager.name;
+    const fetchEndpoints = async (strategy_route: string | null = null) => {
+        if (strategy_route === null) {
+            if (selectedStrategy === null)
+                return;
+            strategy_route = selectedStrategy.route;
         }
 
-        axios.get(strategyManagerRoute + manager_name)
+        axios.get(strategyRoute + strategy_route)
             .then(response => {
                 if (response.status === 200) {
                     const available_endpoints = response.data;
-                    setAvailableManagerEndpoints(available_endpoints);
+
+                    if (available_endpoints)
+                        setAvailableEndpoints(available_endpoints);
                 }
             })
             .catch(error => {
@@ -196,12 +205,12 @@ const Strategies: React.FC = () => {
     };
 
     useEffect(() => {
-        if (selectedManager !== null && selectedManager.manager.status === "available") {
-            fetchAvailableEndpoints();
+        if (selectedStrategy !== null) {
+            fetchEndpoints();
         } else {
-            setAvailableManagerEndpoints({});
+            setAvailableEndpoints({});
         }
-    }, [selectedManager]);
+    }, [selectedStrategy]);
 
     return (
         <div className={styles.containerStrategies}>
@@ -214,18 +223,18 @@ const Strategies: React.FC = () => {
             </header>
 
             <div className={styles.managerDropdownContainer}>
-                <select id="managerDropdown" className={styles.managerDropdown} onChange={handleManagerSelect}>
+                <select id="managerDropdown" className={styles.managerDropdown} onChange={handleStrategySelect}>
                     <option value="">Select a model...</option>
-                    {Object.entries(availableManagers).map(([modelName, Model]) => (
-                        <option key={modelName} value={modelName}>
-                            {modelName}
+                    {Object.entries(availableStrategies).map(([_, strategy]) => (
+                        <option key={strategy.name} value={strategy.name}>
+                            {strategy.name}
                         </option>
                     ))}
                 </select>
 
                 <p className={styles.selectedManagerDisplay}>
                     Selected
-                    Model: {selectedManager !== null ? selectedManager.name + " " + selectedManager.manager.route : 'None'}
+                    Strategy: {selectedStrategy !== null ? selectedStrategy.name + " " + selectedStrategy.route : 'None'}
                 </p>
             </div>
 
@@ -254,55 +263,13 @@ const Strategies: React.FC = () => {
                 </div>
             </section>
 
-            <section className={styles.portfolio}>
-                <h2 className={styles.sectionHeading}>Portfolio</h2>
-                {portfolio && (
-                    <div className={styles.portfolioInfo}>
-                        <p className={styles.portfolioLabel}>Current Cash: $ {portfolio.current_cash.toFixed(2)}</p>
-                        <p className={styles.portfolioLabel}>Current Asset value: $ {portfolio.current_value.toFixed(2)}</p>
-                        <p className={styles.portfolioLabel}>Current Assets:</p>
-                        <ul className={styles.assetList}>
-                            {Object.entries(portfolio.current_assets).map(([asset, value]) => (
-                                <li key={asset} className={styles.assetItem}>
-                                    {asset}: {value.toFixed(2)}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-            </section>
-
-            <section className={styles.history}>
-                <h2 className={styles.sectionHeading}>History</h2>
-                {history && (
-                    <div className={styles.historyTableContainer}>
-                        <table className={styles.historyTable}>
-                            <thead>
-                                <tr>
-                                    <th>Timestamp</th>
-                                    {Object.keys(history).map((asset) => (
-                                        <th key={asset}>{asset}</th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {Object.keys(history[Object.keys(history)[0]]).slice(0, showHistory).map((timestamp) => (
-                                    <tr key={timestamp}>
-                                        <td>{new Date(parseInt(timestamp)).toLocaleDateString()}</td>
-                                        {Object.keys(history).map((asset) => (
-                                            <td key={asset}>{history[asset][timestamp].toFixed(2)}</td>
-                                        ))}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        {Object.keys(history[Object.keys(history)[0]]).length > showHistory && (
-                            <button onClick={() => setShowHistory(showHistory + 10)} className={styles.showMoreButton}>
-                                Show More
-                            </button>
-                        )}
-                    </div>
-                )}
+            <section className={styles.portfolioSection}>
+                <h2 className={styles.sectionHeading}>Portfolios</h2>
+                <div className={styles.portfolioList}>
+                    {Object.entries(portfolios).map(([_, portfolio]) => (
+                        <PortfolioComponent key={portfolio.name} portfolio={portfolio} />
+                    ))}
+                </div>
             </section>
 
             {/* Interactive Plot Section */}
@@ -310,21 +277,13 @@ const Strategies: React.FC = () => {
                 <h2>Visualizations</h2>
                 {history && (
                     <div className={styles.interactivePlots}>
-                        <Plot
-                            data={Object.keys(history).map((asset) => ({
-                                type: 'scatter',
-                                mode: 'lines',
-                                name: asset,
-                                x: Object.keys(history[asset]),
-                                y: Object.values(history[asset]),
-                            }))}
-                            layout={{
-                                title: 'Historical Asset Values',
-                                xaxis: { title: 'Timestamp' },
-                                yaxis: { title: 'Asset Value' },
-                                width: window.innerWidth - 40
-                            }}
-
+                        <SecurityGraph
+                            data={history.df}
+                            title="Historical Asset Values"
+                            xTitle="Timestamp"
+                            yTitle="Asset Value"
+                            width={window.innerWidth - 40}
+                            selectedColumns={["Close"]}
                         />
                     </div>
                 )}

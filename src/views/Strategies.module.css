@@ -156,6 +156,27 @@
     color: #ffffff;
 }
 
+.portfolioSection {
+    background-color: black;
+    padding: 20px;
+    border: 1px solid #ffd700; /* Golden border */
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.sectionHeading {
+    font-size: 24px;
+    color: #ffd700; /* Golden text color */
+    margin-bottom: 10px;
+}
+
+.portfolioList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+}
+
 .assetList {
     list-style: none;
     padding: 0;
