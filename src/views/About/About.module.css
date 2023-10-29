@@ -1,0 +1,78 @@
+/* About.module.css */
+
+.aboutpage {
+  padding: 20px;
+  color: #1a1a1a;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  text-align: justify;
+}
+
+.header {
+  background-color: #000000;
+  color: #ffffff;
+  padding: 20px 0;
+  text-align: center;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.logo {
+  margin: 0 auto;
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.intro {
+  margin-top: 20px;
+}
+
+.highlight {
+  background-color: #FFD700;
+  color: #000000;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+h1 {
+  margin: 10px 0;
+}
+
+h2 {
+  margin: 20px 0;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+}
+
+li {
+  margin-bottom: 10px;
+}
+
+.highlightlink {
+  background-color: #FFD700;
+  color: #000000;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 20px;
+}
+
+.highlightlink:hover {
+  background-color: #b8a000;
+  color: #ffffff;
+}
+
+
+
+
