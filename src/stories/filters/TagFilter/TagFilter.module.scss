@@ -1,0 +1,105 @@
+/* CSS for tag input field */
+
+.tag-filter {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    background-color: #fff;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #495057;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+    .tag-container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 0.25rem;
+        background-color: #fff;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        color: #495057;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        position: relative;
+    }
+
+    .tag-container {
+        .tag-box {
+            display: flex;
+            align-items: center;
+            margin: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 0.25rem;
+            background-color: #fff;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #495057;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .tag-box .tag-close {
+            /* Center vertically*/
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 0.5rem;
+            cursor: pointer;
+        }
+
+        .tag-input {
+            flex: 1;
+            margin: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border: transparent;
+            background-color: #fff;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #495057;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        :focus {
+            outline: none;
+        }
+        ::placeholder {
+            color: #6c757d;
+            opacity: 0.5;
+        }
+    }
+
+    /* Tag suggestions: Dropdown of spans with tag suggestions to be clicked or written */
+    .tag-suggestions {
+        position: absolute;
+        top: 100%; /* Position it just below the tag-container */
+        left: 0;
+        width: 100%;
+        max-height: 200px; /* Set a maximum height for the dropdown, add overflow as needed */
+        overflow-y: auto; /* Add a vertical scrollbar when the content exceeds the max height */
+        background-color: #fff; /* Background color for the suggestions */
+        border: 1px solid #ccc;
+        border-top: 0; /* Remove top border to connect with the tag-container */
+        border-radius: 0 0 4px 4px; /* Round the bottom corners */
+        z-index: 1; /* Ensure the dropdown appears above other content */
+    }
+
+    .tag-suggestions ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .tag-suggestions li {
+        padding: 8px 16px; /* Add padding to each suggestion item */
+        cursor: pointer;
+        border-bottom: 1px solid #ccc; /* Add a border between suggestion items */
+    }
+
+    .tag-suggestions li:hover {
+        background-color: #f0f0f0; /* Highlight on hover */
+    }
+}
