@@ -1,0 +1,91 @@
+// TableStyles.module.scss
+
+$table-background: #252422;
+$secondary-color: #404040;
+$detail-color: #FFD93B;
+$select-color: #8e8e8e;
+$text-color: #FFF;
+$border-color: darken($secondary-color, 20%);
+
+.tableContainer {
+  max-width: 100%; // Ensures the container does not exceed the width of its parent
+  overflow-x: auto; // Adds a horizontal scrollbar when the table overflows
+}
+
+.table {
+  width: 100%;
+  background-color: $table-background;
+  color: $text-color;
+  border-collapse: collapse;
+
+  th, td {
+    padding: 0.5rem 1rem;
+    border: 1px solid $border-color;
+  }
+
+  th {
+    background-color: $secondary-color;
+    font-weight: bold;
+  }
+
+  tbody {
+    .selectedRow:nth-child(n) {
+      background-color: $select-color;
+    }
+
+    tr:nth-child(odd) {
+      background-color: $secondary-color;
+    }
+
+    tr:nth-child(even) {
+      background-color: darken($secondary-color, 5%);
+    }
+
+    td {
+      border-top: none;
+      border-bottom: none;
+    }
+  }
+
+  tr {
+    &:last-child {
+      td {
+        border-bottom: 1px solid $border-color;
+      }
+    }
+  }
+
+  th {
+    &:not(:last-child) {
+      border-right: 1px solid $border-color;
+    }
+  }
+
+  .header-group {
+    background-color: $detail-color;
+    color: $table-background;
+  }
+
+  .cell {
+    text-align: left;
+    vertical-align: top;
+  }
+}
+
+.exportButton {
+    margin: 10px;
+    width: 100px;
+    background-color: $secondary-color;
+    color: $detail-color;
+    border: none;
+    padding: 5px 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.exportButton:hover {
+    background-color: #383838;
+    color: #bda747;
+}

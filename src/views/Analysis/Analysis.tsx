@@ -4,14 +4,17 @@ import {TagFilter} from "../../stories/filters/TagFilter/TagFilter";
 import {ScatterGraph} from "../../stories/graphs/ScatterGraph";
 import {Dropdown} from "../../stories/selectors/Dropdown.tsx";
 import {LoadingOverlay} from "../../components/LoadingOverlay/LoadingOverlay.tsx";
-import {Table} from "../../components/Table/Table.tsx";
+import {MultiHeaderTable} from "../../components/MultiHeaderTable/MultiHeaderTable.tsx";
 
-import {CSVLink} from 'react-csv';
-import style from './Analysis.module.scss';
 // Define custom stock data type
 
 type StockDataKey = 'Close' | 'Open' | 'High' | 'Low' | 'Volume';
 
+function strToKey (str: string): StockDataKey {
+    return str as StockDataKey;
+}
+
+// Make default format be plotly line graph
 interface Stock {
     Symbol: string;
     Close: number[];
@@ -19,7 +22,7 @@ interface Stock {
     High: number[];
     Low: number[];
     Volume: number[];
-    Format: string;
+    Format?: 'line' | 'candlestick';
 }
 
 
@@ -44,6 +47,66 @@ const default_url = "http://localhost:3000";
 function range(start: number, end: number): number[] {
     return Array.from({length: end - start}, (_, i) => start + i);
 }
+
+const stocksToData = (stocks: Stock[]) => {
+    // Find the maximum length of the time series data across all stocks
+    const maxLength = Math.max(...stocks.map(stock => stock.Close.length));
+
+    // Initialize the table data array with indices and empty stock data
+    const data = Array.from({length: maxLength}, (_, idx) => ({
+        idx,
+        ...stocks.reduce((acc: any, stock) => {
+            acc[stock.Symbol] = {
+                close: 0,
+                open: 0,
+                high: 0,
+                low: 0,
+                volume: 0
+            };
+            return acc;
+        }, {})
+    }));
+
+    // Populate the data with actual values from the stocks
+    stocks.forEach(stock => {
+        stock.Close.forEach((close, idx) => {
+            data[idx][stock.Symbol].close = close;
+        });
+        stock.Open.forEach((open, idx) => {
+            data[idx][stock.Symbol].open = open;
+        });
+        stock.High.forEach((high, idx) => {
+            data[idx][stock.Symbol].high = high;
+        });
+        stock.Low.forEach((low, idx) => {
+            data[idx][stock.Symbol].low = low;
+        });
+        stock.Volume.forEach((volume, idx) => {
+            data[idx][stock.Symbol].volume = volume;
+        });
+    });
+
+    return data;
+};
+
+const stocksToColumns = (stocks: Stock[]) => {
+    const stockColumns = stocks.map(stock => ({
+        Header: stock.Symbol,
+        accessor: stock.Symbol,
+        columns: [
+            {Header: 'Close', accessor: `${stock.Symbol}.close`},
+            {Header: 'Open', accessor: `${stock.Symbol}.open`},
+            {Header: 'High', accessor: `${stock.Symbol}.high`},
+            {Header: 'Low', accessor: `${stock.Symbol}.low`},
+            {Header: 'Volume', accessor: `${stock.Symbol}.volume`},
+        ],
+    }));
+
+    return [
+        {Header: 'Index', accessor: 'idx'},
+        ...stockColumns
+    ];
+};
 
 const Analysis: React.FC = () => {
     const [selectedColumn, setSelectedColumn] = useState<StockDataKey>('Close');
@@ -114,7 +177,7 @@ const Analysis: React.FC = () => {
     }
 
     return (
-        <div>
+        <div style={{"margin": "auto", "width": "95%", "padding": "22px"}}>
             {loading && <LoadingOverlay/>}
             <h1>Analysis</h1>
             <div>
@@ -126,10 +189,16 @@ const Analysis: React.FC = () => {
                 {
                     selectedStocks.length > 0 &&
                     <div>
-                        <CSVLink className={style["button-export"]} data={selectedStocks}>Export to CSV</CSVLink>
-                        <Table stocks={selectedStocks} indexes={range(0, selectedStocks[0].Close.length)}
-                               onChange={setSelectedColumn}/>
-                        <Dropdown options={Object.keys(endpoints.indicators)} onOptionChange={setSelectedIndicator}/>
+                        <MultiHeaderTable columns={stocksToColumns(selectedStocks)} data={stocksToData(selectedStocks)}
+                                            onSelect={console.log}/>
+
+                        <div>
+                            <p>Select an indicator to analyze</p>
+                            <Dropdown options={Object.keys(endpoints.indicators)} onOptionChange={setSelectedIndicator}/>
+                            <p>Select a column to analyze</p>
+                            {/*Cant use setSelectedColumn because has to select one of possible columns, use lambda function*/}
+                            <Dropdown options={Object.keys(selectedStocks[0])} onOptionChange={(option) => setSelectedColumn(strToKey(option))}/>
+                        </div>
                         <div>
                             <h3>Select series analysis features to perform</h3>
                             <TagFilter availableTags={Object.keys(endpoints.analysis)}
@@ -146,6 +215,7 @@ const Analysis: React.FC = () => {
                                                 y: stock[selectedColumn],
                                                 name: stock.Symbol
                                             }))}
+                                            lines={true}
                                         />
                                     }
                                 </div>
