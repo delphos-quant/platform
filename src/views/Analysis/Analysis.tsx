@@ -163,8 +163,6 @@ const Analysis: React.FC = () => {
                 tickers: tickers,
             }
 
-            console.log(body);
-
             const response = await fetch(default_url + "/stocks", {
                 method: 'POST',
                 headers: {
