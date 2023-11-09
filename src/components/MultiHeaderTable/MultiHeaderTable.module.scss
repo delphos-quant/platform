@@ -11,7 +11,7 @@ $border-color: darken($secondary-color, 20%);
   max-width: 100%; // Ensures the container does not exceed the width of its parent
   max-height: 640px; // Ensures the container does not exceed the height of its parent
   overflow-x: auto; // Adds a horizontal scrollbar when the table overflows
-    overflow-y: auto; // Adds a vertical scrollbar when the table overflows
+  overflow-y: auto; // Adds a vertical scrollbar when the table overflows
 }
 
 .table {

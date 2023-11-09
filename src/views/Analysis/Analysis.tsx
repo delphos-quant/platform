@@ -10,21 +10,6 @@ import {MultiHeaderTable} from "../../components/MultiHeaderTable/MultiHeaderTab
 
 type StockDataKey = 'Close' | 'Open' | 'High' | 'Low' | 'Volume';
 
-function strToKey(str: string): StockDataKey {
-    return str as StockDataKey;
-}
-
-// Make default format be plotly line graph
-interface Stock {
-    Ticker: string;
-    Close: number[];
-    Open: number[];
-    High: number[];
-    Low: number[];
-    Volume: number[];
-    Format?: 'line' | 'candlestick';
-}
-
 
 const endpoints = {
     indicators: {
@@ -44,102 +29,28 @@ const endpoints = {
 
 const default_url = "http://localhost:8000";
 
-function range(start: number, end: number): number[] {
-    return Array.from({length: end - start}, (_, i) => start + i);
-}
-
-const stocksToData = (stocks: Stock[]) => {
-    // Find the maximum length of the time series data across all stocks
-    const maxLength = Math.max(...stocks.map(stock => stock.Close.length));
-
-    // Initialize the table data array with indices and empty stock data
-    const data = Array.from({length: maxLength}, (_, idx) => ({
-        idx,
-        ...stocks.reduce((acc: any, stock) => {
-            acc[stock.Ticker] = {
-                close: 0,
-                open: 0,
-                high: 0,
-                low: 0,
-                volume: 0
-            };
-            return acc;
-        }, {})
-    }));
-
-    // Populate the data with actual values from the stocks
-    stocks.forEach(stock => {
-        stock.Close.forEach((close, idx) => {
-            data[idx][stock.Ticker].close = close;
-        });
-        stock.Open.forEach((open, idx) => {
-            data[idx][stock.Ticker].open = open;
-        });
-        stock.High.forEach((high, idx) => {
-            data[idx][stock.Ticker].high = high;
-        });
-        stock.Low.forEach((low, idx) => {
-            data[idx][stock.Ticker].low = low;
-        });
-        stock.Volume.forEach((volume, idx) => {
-            data[idx][stock.Ticker].volume = volume;
-        });
+const formatGraphData = (data: any, index: number[]) => {
+    return Object.keys(data).map((ticker) => {
+        return {
+            x: index,
+            y: data[ticker],
+            name: ticker,
+            mode: 'markers',
+            type: 'scatter'
+        }
     });
-
-    return data;
-};
-
-const stocksToColumns = (stocks: Stock[]) => {
-    const stockColumns = stocks.map(stock => ({
-        Header: stock.Ticker,
-        accessor: stock.Ticker,
-        columns: [
-            {Header: 'Close', accessor: `${stock.Ticker}.close`},
-            {Header: 'Open', accessor: `${stock.Ticker}.open`},
-            {Header: 'High', accessor: `${stock.Ticker}.high`},
-            {Header: 'Low', accessor: `${stock.Ticker}.low`},
-            {Header: 'Volume', accessor: `${stock.Ticker}.volume`},
-        ],
-    }));
-
-    return [
-        {Header: 'Index', accessor: 'idx'},
-        ...stockColumns
-    ];
-};
-
-const formatStock = (data: any) => {
-    const stock: Stock = {
-        Ticker: data.df.columns.Close.symbol,
-        Close: [],
-        Open: [],
-        High: [],
-        Low: [],
-        Volume: [],
-    };
-
-    for (let i = 0; i < data.df.data.length; i++) {
-        stock.Close.push(data.df.data[i][0]);
-        stock.High.push(data.df.data[i][1]);
-        stock.Low.push(data.df.data[i][2]);
-        stock.Open.push(data.df.data[i][4]);
-        stock.Volume.push(data.df.data[i][6]);
-    }
-
-
-
-    return stock;
 }
 
 const Analysis: React.FC = () => {
-    const [selectedColumn, setSelectedColumn] = useState<StockDataKey>('Close');
-    const [selectedIndicator, setSelectedIndicator] = useState<string>("");
+    const [selectedColumn,] = useState<StockDataKey>('Close');
+    const [selectedIndicator, setSelectedIndicator] = useState<string>("value");
     const [selectedAnalysis, setSelectedAnalysis] = useState<string[]>([]);
-    const [selectedStocks, setSelectedStocks] = useState<Stock[]>([]);
-    const [availableStocks, setAvailableStocks] = useState<Stock[]>([]);
-    const [availableTickers, setTickers] = useState<string[]>([]);
+    const [tickers, setTickers] = useState<string[]>([]);
+    const [selectedTickers, setSelectedTickers] = useState<string[]>([]);
+    const [stocks, setStocks] = useState<any>([]);
+    const [selectedStocks, setSelectedStocks] = useState<any>([]);
 
-    const [graphData, setGraphData] = useState<number[]>([]);
+    const [graphData, setGraphData] = useState<any>([]);
 
     const [loading, setLoading] = useState(true);
 
@@ -182,57 +93,90 @@ const Analysis: React.FC = () => {
     React.useEffect(() => {
         fetchTickers().then((data) => {
             setTickers(data);
-            console.log(data);
 
             fetchStocks(data).then((data) => {
-                console.log(data);
-
-                const stocks = data.map((stock: any) => formatStock(stock.data));
-                setAvailableStocks(stocks);
-                setSelectedStocks(stocks);
+                setStocks(data);
             });
         });
     }, []);
 
-    const onStockChange = (stocks: string[]) => {
-        // filter availableStocks given stocks
-        // set selectedStocks to filtered list
-        // filter availableStocks: Stock[] given stocks: string[]
-        let filteredStocks = [];
-        for (let i = 0; i < stocks.length; i++) {
-            for (let j = 0; j < availableStocks.length; j++) {
-                if (stocks[i] === availableStocks[j].Ticker) {
-                    filteredStocks.push(availableStocks[j]);
-                }
+    React.useEffect(() => {
+        const filteredStocks = {
+            "index": stocks.index,
+            "data": {
+                "Close": {},
+                "Open": {},
+                "High": {},
+                "Low": {},
+                "Volume": {},
+                "VWAP": {},
+                "NumTrades": {},
             }
-        }
-        if (filteredStocks.length === 0) {
-            filteredStocks = availableStocks;
+        };
+
+        if (selectedTickers.length === 0 || stocks.data === undefined || stocks.index === undefined) {
+            setSelectedStocks(filteredStocks);
+            return;
         }
 
+        filteredStocks.data.Close = Object.fromEntries(Object.entries(stocks.data.Close).filter(([key,]) => selectedTickers.includes(key)));
+        filteredStocks.data.Open = Object.fromEntries(Object.entries(stocks.data.Open).filter(([key,]) => selectedTickers.includes(key)));
+        filteredStocks.data.High = Object.fromEntries(Object.entries(stocks.data.High).filter(([key,]) => selectedTickers.includes(key)));
+        filteredStocks.data.Low = Object.fromEntries(Object.entries(stocks.data.Low).filter(([key,]) => selectedTickers.includes(key)));
+        filteredStocks.data.Volume = Object.fromEntries(Object.entries(stocks.data.Volume).filter(([key,]) => selectedTickers.includes(key)));
+        filteredStocks.data.VWAP = Object.fromEntries(Object.entries(stocks.data.VWAP).filter(([key,]) => selectedTickers.includes(key)));
+        filteredStocks.data.NumTrades = Object.fromEntries(Object.entries(stocks.data.NumTrades).filter(([key,]) => selectedTickers.includes(key)));
+
         setSelectedStocks(filteredStocks);
+    }, [selectedTickers, stocks]);
+
+    const fetchAnalysis = async () => {
+        try {
+            setLoading(true);
+            console.log(JSON.stringify({
+                    "indicator": [selectedIndicator],
+                    "fields": selectedColumn,
+                    "operations": selectedAnalysis,
+                    "tickers": selectedTickers
+                }));
+            const response = await fetch(default_url + '/analysis', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "indicators": [selectedIndicator],
+                    "fields": selectedColumn,
+                    "operations": selectedAnalysis,
+                    "tickers": selectedTickers
+                }),
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Failed to fetch stocks:', error);
+        } finally {
+            setLoading(false);
+        }
     }
 
     React.useEffect(() => {
-        const fetchAnalysis = async () => {
-            try {
-                setLoading(true);
-                const response = await fetch(default_url + `/analysis/?indicator=${selectedIndicator}&field=${selectedColumn}&tickers=${selectedStocks.map(stock => stock.Ticker).join(',')}&operation=${selectedAnalysis.join(',')}`);
-                return await response.json();
-            } catch (error) {
-                console.error('Failed to fetch stocks:', error);
-            } finally {
-                setLoading(false);
-            }
-        }
+        // For each analysis in selectedAnalysis, fetch analysis and add to graphdata dict given analysis name
+        // graphData = {analysisName: [analysisData]}
+        fetchAnalysis().then((data) => {
+            console.log(data);
+            setGraphData(data);
+        });
 
-        if (selectedAnalysis.length > 0) {
-            fetchAnalysis().then((data) => {
-                setGraphData(data);
-            });
-        }
+    }, [selectedColumn, selectedIndicator, selectedAnalysis, selectedStocks]);
 
-    }, [selectedColumn, selectedIndicator, selectedAnalysis]);
+    const onFilterChange = (selectedTickers: string[]) => {
+        // filter availableStocks given stocks
+        // set selectedStocks to filtered list
+        // filter availableStocks: Stock[] given stocks: string[]
+        let filteredTickers = tickers.filter((ticker) => selectedTickers.includes(ticker));
+
+        setSelectedTickers(filteredTickers);
+    }
 
     return (
         <div style={{"margin": "auto", "width": "95%", "padding": "22px"}}>
@@ -241,23 +185,29 @@ const Analysis: React.FC = () => {
             <div>
                 <h3>Filter stocks to analyze</h3>
                 {
-                    availableTickers.length > 0 &&
-                    <TagFilter availableTags={availableTickers} onTagsChange={onStockChange}/>
+                    tickers.length > 0 &&
+                    <TagFilter availableTags={tickers} onTagsChange={onFilterChange}/>
                 }
                 {
-                    selectedStocks.length > 0 &&
+                    selectedTickers.length > 0 &&
                     <div>
-                        <MultiHeaderTable columns={stocksToColumns(selectedStocks)} data={stocksToData(selectedStocks)}
-                                          onSelect={console.log}/>
+                        {
+                            selectedStocks.data !== undefined && selectedStocks.index !== undefined &&
+                            <MultiHeaderTable secondLevelColumns={selectedTickers}
+                                              data={selectedStocks.data}
+                                              index={selectedStocks.index}/>
+                        }
 
                         <div>
                             <p>Select an indicator to analyze</p>
                             <Dropdown options={Object.keys(endpoints.indicators)}
                                       onOptionChange={setSelectedIndicator}/>
+                            {/*
                             <p>Select a column to analyze</p>
-                            {/*Cant use setSelectedColumn because has to select one of possible columns, use lambda function*/}
-                            <Dropdown options={Object.keys(selectedStocks[0])}
+                            <Dropdown options={Object.keys(tickers[0])}
                                       onOptionChange={(option) => setSelectedColumn(strToKey(option))}/>
+
+                            */}
                         </div>
                         <div>
                             <h3>Select series analysis features to perform</h3>
@@ -265,21 +215,22 @@ const Analysis: React.FC = () => {
                                        onTagsChange={setSelectedAnalysis}/>
                         </div>
                         {
-                            selectedAnalysis.map((analysis) => (
-                                <div>
-                                    <h3>{analysis}</h3>
-                                    {
-                                        <ScatterGraph
-                                            data={selectedStocks.map(stock => ({
-                                                x: range(0, stock[selectedColumn].length),
-                                                y: graphData,
-                                                name: stock.Ticker
-                                            }))}
-                                            lines={true}
-                                        />
-                                    }
-                                </div>
-                            ))
+                            graphData !== undefined && Object.keys(graphData).length > 0 &&
+                            <div>
+                                <h3>Graphs</h3>
+                                {
+                                    Object.keys(graphData).map((indicatorName) => {
+                                        return (
+                                            Object.keys(graphData[indicatorName]).map((analysisName) => {
+                                                return (
+                                                    <ScatterGraph
+                                                        data={formatGraphData(graphData[indicatorName][analysisName].data, graphData[indicatorName][analysisName].index)}></ScatterGraph>
+                                                )
+                                            })
+                                        )
+                                    })
+                                }
+                            </div>
                         }
                     </div>
                 }
