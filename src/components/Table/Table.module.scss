@@ -1,0 +1,50 @@
+// Table.module.scss
+.table-container {
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+
+        thead {
+            tr {
+                th {
+                    text-align: left;
+                    background-color: #f0f0f0;
+                    padding: 10px;
+                    border-bottom: 1px solid #ddd;
+                }
+            }
+        }
+
+        tbody {
+            tr {
+                td {
+                    padding: 10px;
+                    border-bottom: 1px solid #ddd;
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+                }
+
+                &:nth-child(odd) {
+                    background-color: #f9f9f9;
+                }
+            }
+        }
+    }
+
+    .button {
+        margin: 10px 5px;
+        padding: 5px 10px;
+        cursor: pointer;
+        background-color: dimgray;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+
+        &:hover {
+            background-color: black;
+        }
+    }
+}

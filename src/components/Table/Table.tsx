@@ -1,65 +1,51 @@
-import React, {useState} from 'react';
-import {Dropdown} from "../../stories/selectors/Dropdown.tsx";
+import { useState } from 'react';
+import styles from './Table.module.scss'; // Import the SCSS module
 
-// Assuming you have a Dropdown component
+const ROWS_PER_PAGE = 10;
 
-// Define a specific type for the keys that will be used to index the stock data
-type StockDataKey = 'Close' | 'Open' | 'High' | 'Low' | 'Volume';
+export const Table = ({ data, columns, index, index_name }: { data: any, columns: any, index: any, index_name: any }) => {
+    const [visibleRows, setVisibleRows] = useState(ROWS_PER_PAGE);
 
-// Stock interface with specific keys
-interface Stock {
-    Symbol: string;
-    Close: number[];
-    Open: number[];
-    High: number[];
-    Low: number[];
-    Volume: number[];
-    Format: string;
-}
+    const handleShowMore = () => {
+        setVisibleRows(prev => Math.min(prev + ROWS_PER_PAGE, index.length));
+    };
 
-interface TableProps {
-    stocks: Stock[];
-    indexes: number[]; // Assuming indexes is an array of numbers
-    onChange: (option: StockDataKey) => void;
-}
-
-export const Table: React.FC<TableProps> = ({stocks, indexes, onChange}) => {
-    // Use a union type for the selectedColumn state to restrict it to valid stock data keys
-    const [selectedColumn, setSelectedColumn] = useState<StockDataKey>('Close');
-
-    // Function to handle the dropdown option change
-    const handleOptionChange = (option: any) => {
-        setSelectedColumn(option);
-        onChange(option);
-    }
+    const handleShowLess = () => {
+        setVisibleRows(prev => Math.max(prev - ROWS_PER_PAGE, ROWS_PER_PAGE));
+    };
 
     return (
-        <div>
-            <Dropdown
-                options={['Close', 'Open', 'High', 'Low', 'Volume']}
-                onOptionChange={handleOptionChange}
-            />
-
-            <table>
+        <div className={styles['table-container']}>
+            <table className={styles['table']}>
                 <thead>
-                <tr>
-                    <th>Date</th>
-                    {stocks.map((stock, idx) => (
-                        <th key={idx}>{stock.Symbol}</th>
-                    ))}
-                </tr>
-                </thead>
-                <tbody>
-                {indexes.map((index, rowIdx) => (
-                    <tr key={rowIdx}>
-                        <td>{index}</td>
-                        {stocks.map((stock, colIdx) => (
-                            <td key={colIdx}>{stock[selectedColumn][index]}</td>
+                    <tr>
+                        <th>{index_name}</th>
+                        {columns.map((column: any) => (
+                            <th key={column}>{column}</th>
                         ))}
                     </tr>
-                ))}
+                </thead>
+                <tbody>
+                    {index.slice(0, visibleRows).map((row: any, i: any) => (
+                        <tr key={row}>
+                            <td>{row}</td>
+                            {columns.map((_: any, j: any) => (
+                                <td key={j}>{data[i][j]}</td>
+                            ))}
+                        </tr>
+                    ))}
                 </tbody>
             </table>
+            {index.length > ROWS_PER_PAGE && (
+                <div>
+                    {visibleRows < index.length && (
+                        <button className={styles['button']} onClick={handleShowMore}>Show More</button>
+                    )}
+                    {visibleRows > ROWS_PER_PAGE && (
+                        <button className={styles['button']} onClick={handleShowLess}>Show Less</button>
+                    )}
+                </div>
+            )}
         </div>
     );
 };
