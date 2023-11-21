@@ -1,0 +1,30 @@
+{
+  "value": {
+    "value": "Value is the price of a stock at a given time, the most basic and widely used metric for assessing a stock's performance.",
+    "returns": "Evaluating a stock's return means assessing the percentage growth over a specific period, crucial for understanding historical performance and informing investment decisions.",
+    "log_change": "Log change in price suits complex algorithms requiring logarithmic properties and invertibility. It's beneficial for models that perform better with percentage variations, offering a robust perspective.",
+    "diff": "Differentiating price provides insights into short-term trend shifts, highlighting significant turning points and detailing price fluctuations.",
+    "detrend": "Detrending price isolates intrinsic variation, offering clearer insights into price changes independent of long-term market trends."
+  },
+  "volatility": {
+    "value": "Volatility is the degree of variation in a stock's price over time, a key metric for assessing risk and return potential.",
+    "returns": "Examining returns against volatility sheds light on the relationship between an asset's price variations and its volatility, aiding investment strategies focused on volatility's impact on returns.",
+    "log_change": "Pairing volatility with log price change is valuable for models requiring a smooth representation of price variations, useful for stability-focused analyses.",
+    "diff": "Differentiating volatility allows examination of price fluctuation changes over time, marking periods of increasing or decreasing volatility and providing market dynamic insights.",
+    "detrend": "Detrending volatility isolates intrinsic variation, offering clearer insights into volatility changes independent of long-term market trends."
+  },
+  "moving_average": {
+    "value": "The moving average is the average price of a stock over a specific period, a key metric for assessing short-term trends and market dynamics.",
+    "diff": "Differentiating the moving average helps analyze short-term trend changes, effective in pinpointing reversals in time series and providing insights into recent market dynamics.",
+    "returns": "Assessing returns relative to the moving average evaluates how price movements compare to medium-term trends, highlighting when returns deviate from historical expectations.",
+    "log_change": "Combining moving averages with log changes smooths out price trend representation, emphasizing growth or decline patterns in a more stable fashion.",
+    "detrend": "Detrending the moving average offers a more accurate analysis of short-term variations, separating them from long-term trends and enhancing understanding of recent market changes."
+  },
+  "bollinger_bands": {
+    "value": "Bollinger Bands are volatility bands placed above and below a moving average, a key metric for assessing price volatility and market dynamics.",
+    "detrend": "Detrending Bollinger Bands compares a stock's volatility range independently of market shifts, useful for isolating an asset's inherent volatility from market trends.",
+    "returns": "Evaluating returns in relation to Bollinger Bands provides insight into how price movements interact with volatility limits, aiding in spotting overbought or oversold conditions.",
+    "log_change": "Pairing Bollinger Bands with log price changes aids in analyzing price movements on a logarithmic scale, beneficial when percentage variations convey more than absolute changes.",
+    "diff": "Differentiating Bollinger Bands highlights absolute volatility changes, identifying periods of increased or decreased price fluctuation relative to the average."
+  }
+}
