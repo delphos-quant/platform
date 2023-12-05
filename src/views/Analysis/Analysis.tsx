@@ -588,6 +588,7 @@ const Analysis: React.FC = () => {
                                                                         forecast[ticker]["residuals"])}/>
                                                                 </div>
                                                                 <p>Error (MAE): {forecast[ticker]["error"]}</p>
+                                                                <p>Fitted Order: (p, d, q) = {forecast[ticker]["order"].toString()}</p>
                                                             </div>
                                                         }
                                                     </Card.Body>
