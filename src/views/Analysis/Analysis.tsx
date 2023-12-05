@@ -145,6 +145,10 @@ const Analysis: React.FC = () => {
     const [seasonality, setSeasonality] = useState<any>({});
     const [seasonalityPeriod, setSeasonalityPeriod] = useState<number>(30);
 
+    const [forecast, setForecast] = useState<any>({});
+    const [forecastPeriod, setForecastPeriod] = useState<number>(30);
+    const [parameters, setParameters] = useState<any>({});
+
     const fetchTickers = async () => {
         try {
             setLoading(true);
@@ -245,6 +249,30 @@ const Analysis: React.FC = () => {
         }
     }
 
+    const fetchForecast = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch(default_url + '/arima', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "tickers": selectedTickers,
+                    "end": forecastPeriod,
+                    "p": parameters["p"],
+                    "d": parameters["d"],
+                    "q": parameters["q"],
+                }),
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Failed to fetch stocks:', error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     React.useEffect(() => {
         fetchAutoCorrelation().then((data) => {
             setAutocorrelation(data);
@@ -275,6 +303,15 @@ const Analysis: React.FC = () => {
             });
         }
     }, [selectedTickers, selectedFields, selectedIndicator, selectedOperations]);
+
+    React.useEffect(() => {
+        setForecast({});
+        if (selectedTickers.length > 0 && selectedFields.length > 0 && selectedOperations.length > 0) {
+            fetchForecast().then((data) => {
+                setForecast(data);
+            });
+        }
+    }, [selectedTickers, selectedFields, selectedOperations, parameters]);
 
     const onFilterChange = (selectedTickers: string[]) => {
         let filteredTickers = tickers.filter((ticker) => selectedTickers.includes(ticker));
@@ -440,7 +477,7 @@ const Analysis: React.FC = () => {
                         </Card>
                         <Card style={{margin: "30px"}}>
                             <Card.Header>
-                                <h3>Autocorrelation, Seasonality and Forecasting</h3>
+                                <h3>Autocorrelation, Seasonality and Forecast</h3>
                             </Card.Header>
                             <Card.Body>
                                 <input type={"number"} placeholder={"Autocorrelation range"} onChange={(e) => {
@@ -450,7 +487,22 @@ const Analysis: React.FC = () => {
                                        onChange={(e) => {
                                            setSeasonalityPeriod(Number(e.target.value));
                                        }}/>
+                                <input type={"number"} placeholder={"Forecast period"} onChange={(e) => {
+                                    setForecastPeriod(Number(e.target.value));
+                                }}/>
 
+                                <div>
+                                    <h3>Set ARIMA p, q and d</h3>
+                                    <input type={"number"} placeholder={"p"} onChange={(e) => {
+                                        setParameters({...parameters, "p": Number(e.target.value)});
+                                    }}/>
+                                    <input type={"number"} placeholder={"d"} onChange={(e) => {
+                                        setParameters({...parameters, "d": Number(e.target.value)});
+                                    }}/>
+                                    <input type={"number"} placeholder={"q"} onChange={(e) => {
+                                        setParameters({...parameters, "q": Number(e.target.value)});
+                                    }}/>
+                                </div>
                                 {/* For each stock, make the same as the previous stock show accordion */}
                                 {/* But now show the PACF graph + seasonality trend, seasonality and residual */}
 
@@ -482,31 +534,33 @@ const Analysis: React.FC = () => {
                                                             seasonality[ticker] &&
                                                             <div className={"row"}>
                                                                 <div className={"col-12"}>
-                                                                    Do note that financial series are intrinsically non-sazonal,
-                                                                    so use the seasonality decomposition with caution.
+                                                                    Do note that financial series are
+                                                                    intrinsically non-sazonal,
+                                                                    so use the seasonality decomposition with
+                                                                    caution.
                                                                 </div>
                                                                 <div className={"col-6"}>
                                                                     <h5>Trend</h5>
                                                                     {
                                                                         seasonality[ticker]["trend"] &&
-                                                                    <ScatterGraph data={formatGraph(
-                                                                        seasonality[ticker]["trend"])}/>
+                                                                        <ScatterGraph data={formatGraph(
+                                                                            seasonality[ticker]["trend"])}/>
                                                                     }
                                                                 </div>
                                                                 <div className={"col-6"}>
                                                                     <h5>Seasonality</h5>
                                                                     {
                                                                         seasonality[ticker]["seasonal"] &&
-                                                                    <ScatterGraph data={formatGraph(
-                                                                        seasonality[ticker]["seasonal"])}/>
+                                                                        <ScatterGraph data={formatGraph(
+                                                                            seasonality[ticker]["seasonal"])}/>
                                                                     }
                                                                 </div>
                                                                 <div className={"col-6"}>
                                                                     <h5>Residual</h5>
                                                                     {
                                                                         seasonality[ticker]["residual"] &&
-                                                                    <ScatterGraph data={formatGraph(
-                                                                        seasonality[ticker]["residual"])}/>
+                                                                        <ScatterGraph data={formatGraph(
+                                                                            seasonality[ticker]["residual"])}/>
                                                                     }
                                                                 </div>
                                                                 <div className={"col-6"}>
@@ -515,6 +569,25 @@ const Analysis: React.FC = () => {
                                                                         pacfValues={autocorrelation["pacf"][ticker]}
                                                                         labels={[...Array(autocorrelationRange).keys()]}/>
                                                                 </div>
+                                                            </div>
+                                                        }
+                                                        {
+                                                            forecast[ticker] &&
+                                                            <div className={"row"}>
+                                                                <div className={"col-12"}>
+                                                                    <h5>Forecast</h5>
+                                                                    {/* Plot predictions on top of real values */}
+                                                                    <ScatterGraph data={formatGraph(
+                                                                        forecast[ticker]["forecast"]["predictions"])}/>
+                                                                    <ScatterGraph data={formatGraph(
+                                                                        forecast[ticker]["forecast"]["values"])}/>
+                                                                </div>
+                                                                <div className={"col-12"}>
+                                                                    <h5>Forecast Residuals</h5>
+                                                                    <ScatterGraph data={formatGraph(
+                                                                        forecast[ticker]["residuals"])}/>
+                                                                </div>
+                                                                <p>Error (MAE): {forecast[ticker]["error"]}</p>
                                                             </div>
                                                         }
                                                     </Card.Body>
